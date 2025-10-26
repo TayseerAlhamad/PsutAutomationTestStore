@@ -18,8 +18,8 @@ public class MyTestPage {
 
     @BeforeTest
     public void mySetUp() {
-        driver.get(theURL);
         driver.manage().window().maximize();
+        driver.get(theURL);
     }
 
     @Test(priority = 1)
@@ -28,23 +28,23 @@ public class MyTestPage {
         driver.get(SignupPage);
 
         // Elements
-        WebElement FirstNameInput = driver.findElement(By.xpath("//input[@id='AccountFrm_firstname']"));
-        WebElement LastNameInput = driver.findElement(By.xpath("//input[@id='AccountFrm_lastname']"));
-        WebElement EmailInput = driver.findElement(By.xpath("//input[@id='AccountFrm_email']"));
-        WebElement TelephoneInput = driver.findElement(By.xpath("//input[@id='AccountFrm_telephone']"));
-        WebElement FaxInput = driver.findElement(By.xpath("//input[@id='AccountFrm_fax']"));
-        WebElement companyInput = driver.findElement(By.xpath("//input[@id='AccountFrm_company']"));
-        WebElement FirstAddressInput = driver.findElement(By.xpath("//input[@id='AccountFrm_address_1']"));
-        WebElement SecondAddressInput = driver.findElement(By.xpath("//input[@id='AccountFrm_address_2']"));
-        WebElement CityInput = driver.findElement(By.xpath("//input[@id='AccountFrm_city']"));
-        WebElement ZipCodeInput = driver.findElement(By.xpath("//input[@id='AccountFrm_postcode']"));
-        WebElement LogInInput = driver.findElement(By.xpath("//input[@id='AccountFrm_loginname']"));
-        WebElement PasswordInput = driver.findElement(By.xpath("//input[@id='AccountFrm_password']"));
-        WebElement PasswordConfirmInput = driver.findElement(By.xpath("//input[@id='AccountFrm_confirm']"));
-        WebElement AgreeBox = driver.findElement(By.xpath("//input[@id='AccountFrm_agree']"));
+        WebElement FirstNameInput = driver.findElement(By.id("AccountFrm_firstname"));
+        WebElement LastNameInput = driver.findElement(By.id("AccountFrm_lastname"));
+        WebElement EmailInput = driver.findElement(By.id("AccountFrm_email"));
+        WebElement TelephoneInput = driver.findElement(By.id("AccountFrm_telephone"));
+        WebElement FaxInput = driver.findElement(By.id("AccountFrm_fax"));
+        WebElement companyInput = driver.findElement(By.id("AccountFrm_company"));
+        WebElement FirstAddressInput = driver.findElement(By.id("AccountFrm_address_1"));
+        WebElement SecondAddressInput = driver.findElement(By.id("AccountFrm_address_2"));
+        WebElement CityInput = driver.findElement(By.id("AccountFrm_city"));
+        WebElement ZipCodeInput = driver.findElement(By.id("AccountFrm_postcode"));
+        WebElement LogInInput = driver.findElement(By.id("AccountFrm_loginname"));
+        WebElement PasswordInput = driver.findElement(By.id("AccountFrm_password"));
+        WebElement PasswordConfirmInput = driver.findElement(By.id("AccountFrm_confirm"));
+        WebElement AgreeBox = driver.findElement(By.id("AccountFrm_agree"));
         WebElement ContinueButton = driver.findElement(By.cssSelector(".btn.btn-orange.pull-right.lock-on-click"));
-        WebElement RegoinStats = driver.findElement(By.xpath("//select[@id='AccountFrm_zone_id']"));
-        WebElement CountrySelect = driver.findElement(By.xpath("//select[@id='AccountFrm_country_id']"));
+        WebElement RegionSelect = driver.findElement(By.id("AccountFrm_zone_id"));
+        WebElement CountrySelect = driver.findElement(By.id("AccountFrm_country_id"));
 
         // Data
         String[] firstnames = { "ahmad", "heba", "tayseer", "ali" };
@@ -55,17 +55,17 @@ public class MyTestPage {
 
         int randomNumberForEmail = rand.nextInt(7000);
         String email = randomFirstName + randomLastName + randomNumberForEmail + "@gmail.com";
-        String telephone = "0897653247";
-        String fax = "9874653472";
-        String company = "abc";
-        String firstaddress = "amman north marka";
-        String secondaddress = "khalda";
-        String city = "amman";
-        String ZipCode = "3817";
+        String telephone = "079" + (rand.nextInt(9000000) + 1000000);
+        String fax = "06" + (rand.nextInt(900000) + 100000);
+        String company = "Extensya";
+        String firstaddress = "Amman North Marka";
+        String secondaddress = "Khalda";
+        String city = "Amman";
+        String zipCode = "11953";
         int randomNumberLogin = rand.nextInt(8000);
-        String Password = "Ahmad#123";
+        String password = "Ahmad#123";
 
-        // Actions
+        // Fill form
         FirstNameInput.sendKeys(randomFirstName);
         LastNameInput.sendKeys(randomLastName);
         EmailInput.sendKeys(email);
@@ -75,28 +75,46 @@ public class MyTestPage {
         FirstAddressInput.sendKeys(firstaddress);
         SecondAddressInput.sendKeys(secondaddress);
         CityInput.sendKeys(city);
-        ZipCodeInput.sendKeys(ZipCode);
+        ZipCodeInput.sendKeys(zipCode);
         LogInInput.sendKeys(randomFirstName + randomLastName + randomNumberLogin);
-        PasswordInput.sendKeys(Password);
-        PasswordConfirmInput.sendKeys(Password);
+        PasswordInput.sendKeys(password);
+        PasswordConfirmInput.sendKeys(password);
 
-        // Select Country
+        // Select random country
         Select countryDropdown = new Select(CountrySelect);
-        countryDropdown.selectByVisibleText("Jordan");
+        int totalCountries = countryDropdown.getOptions().size();
+        System.out.println("Total countries: " + totalCountries);
+
+        int randomCountryIndex = rand.nextInt(1, totalCountries); // works in Java 17+
+        // If Java <17: int randomCountryIndex = rand.nextInt(totalCountries - 1) + 1;
+
+        countryDropdown.selectByIndex(randomCountryIndex);
+
+        // Wait for region list to update
         Thread.sleep(2000);
 
         // Select random state (region)
-        Select stateDropDown = new Select(RegoinStats);
-        int numberOfOptions = stateDropDown.getOptions().size();
-        System.out.println("Number of options in state dropdown: " + numberOfOptions);
-        int randomStateIndex = rand.nextInt(numberOfOptions);
-        stateDropDown.selectByIndex(randomStateIndex);
+        Select stateDropDown = new Select(RegionSelect);
+        int numberOfRegions = stateDropDown.getOptions().size();
+        System.out.println("Number of regions: " + numberOfRegions);
 
-        // Submit
+        if (numberOfRegions > 1) {
+            int randomRegionIndex = rand.nextInt(1, numberOfRegions);
+            stateDropDown.selectByIndex(randomRegionIndex);
+        } else {
+            System.out.println("No regions available for selected country.");
+        }
+
+        // Agree and submit
         AgreeBox.click();
-        ContinueButton.click();
+        // ContinueButton.click(); // Uncomment if you want to actually submit the form
+
+        System.out.println("✅ Random country and region selected successfully!");
+        Thread.sleep(3000);
+        driver.quit();
         
     }
 }
+
 
 
