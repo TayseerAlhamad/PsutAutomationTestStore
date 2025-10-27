@@ -1,5 +1,6 @@
 package LoginPage;
 
+import java.util.List;
 import java.util.Random;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -15,7 +16,8 @@ public class MyTestPage {
     String theURL = "https://automationteststore.com/";
     String SignupPage = "https://automationteststore.com/index.php?rt=account/create";
     Random rand = new Random();
-
+    String TheUserName = "randomFirstName + randomLastName + randomNumberForEmail";
+    String ThePassword = "Ahmad#123";
     @BeforeTest
     public void mySetUp() {
         driver.manage().window().maximize();
@@ -52,7 +54,9 @@ public class MyTestPage {
 
         String[] lastnames = { "sameer", "hatem", "abdallah", "mohammed" };
         String randomLastName = lastnames[rand.nextInt(lastnames.length)];
-
+        TheUserName = randomFirstName + randomLastName ;
+        ThePassword = "Ahmad#123";
+        
         int randomNumberForEmail = rand.nextInt(7000);
         String email = randomFirstName + randomLastName + randomNumberForEmail + "@gmail.com";
         String telephone = "079" + (rand.nextInt(9000000) + 1000000);
@@ -107,12 +111,43 @@ public class MyTestPage {
 
         // Agree and submit
         AgreeBox.click();
-        // ContinueButton.click(); // Uncomment if you want to actually submit the form
-
+         ContinueButton.click(); // Uncomment if you want to actually submit the form
+        Thread.sleep(3000);
+        
         System.out.println("✅ Random country and region selected successfully!");
         Thread.sleep(3000);
-        driver.quit();
         
+        //driver.quit();
+        
+    }
+    @Test (priority = 2)
+    public void Logout() throws InterruptedException {
+    	
+    	//element
+    	WebElement LogoutButton = driver.findElement(By.linkText("Logoff"));
+    	List<WebElement> buttons = driver.findElements(By.xpath("//a[normalize-space()='Continue']"));
+    	
+    	
+    	//action
+    	LogoutButton.click();
+    	Thread.sleep(3000);
+    	buttons.get(0).click();
+    	
+    }
+    @Test (priority = 3)
+    public void Login () {
+        //element 
+    	WebElement LoginButton = driver.findElement(By.partialLinkText("Login or "));
+    	WebElement LoginName = driver.findElement(By.id("loginFrm_loginname"));
+    	WebElement PasswordLogin = driver.findElement(By.id("loginFrm_password"));
+    	WebElement LoginButton1 = driver.findElement(By.xpath("//button[normalize-space()='Login']"));
+    	
+    	//action
+    	LoginButton.click();
+    	LoginName.sendKeys(TheUserName);
+    	PasswordLogin.sendKeys(ThePassword);
+    	LoginButton1.click();
+    	
     }
 }
 
