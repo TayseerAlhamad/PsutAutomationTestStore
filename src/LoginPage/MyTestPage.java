@@ -1,12 +1,15 @@
 package LoginPage;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -24,7 +27,7 @@ public class MyTestPage {
         driver.get(theURL);
     }
 
-    @Test(priority = 1)
+    @Test(priority = 1 ,enabled = false)
     public void SignUp() throws InterruptedException {
         Thread.sleep(3000);
         driver.get(SignupPage);
@@ -84,31 +87,19 @@ public class MyTestPage {
         PasswordInput.sendKeys(password);
         PasswordConfirmInput.sendKeys(password);
 
-        // Select random country
-        Select countryDropdown = new Select(CountrySelect);
-        int totalCountries = countryDropdown.getOptions().size();
-        System.out.println("Total countries: " + totalCountries);
+        // Select Country state
+        Select country = new Select(CountrySelect);
+        int randomCountry = new Random().nextInt(country.getOptions().size());
+        country.selectByIndex(randomCountry);
 
-        int randomCountryIndex = rand.nextInt(1, totalCountries); // works in Java 17+
-        // If Java <17: int randomCountryIndex = rand.nextInt(totalCountries - 1) + 1;
+        // wait 
+        Thread.sleep(1000);
 
-        countryDropdown.selectByIndex(randomCountryIndex);
-
-        // Wait for region list to update
-        Thread.sleep(2000);
-
-        // Select random state (region)
-        Select stateDropDown = new Select(RegionSelect);
-        int numberOfRegions = stateDropDown.getOptions().size();
-        System.out.println("Number of regions: " + numberOfRegions);
-
-        if (numberOfRegions > 1) {
-            int randomRegionIndex = rand.nextInt(1, numberOfRegions);
-            stateDropDown.selectByIndex(randomRegionIndex);
-        } else {
-            System.out.println("No regions available for selected country.");
-        }
-
+        // Select Region
+        Select region = new Select(RegionSelect);
+        if (region.getOptions().size() > 0) {
+            int randomRegion = new Random().nextInt(region.getOptions().size());
+            region.selectByIndex(randomRegion);
         // Agree and submit
         AgreeBox.click();
          ContinueButton.click(); // Uncomment if you want to actually submit the form
@@ -119,36 +110,66 @@ public class MyTestPage {
         
         //driver.quit();
         
-    }
-    @Test (priority = 2)
+    }}
+    @Test (priority = 2,enabled = false)
     public void Logout() throws InterruptedException {
+ 
     	
-    	//element
-    	WebElement LogoutButton = driver.findElement(By.linkText("Logoff"));
-    	List<WebElement> buttons = driver.findElements(By.xpath("//a[normalize-space()='Continue']"));
-    	
-    	
-    	//action
-    	LogoutButton.click();
+    	WebElement logoutButton = driver.findElement(By.linkText("Logoff"));
+    	logoutButton.click();
+
+    	// wait a bit to allow the page to reload
     	Thread.sleep(3000);
-    	buttons.get(0).click();
+
+    	// find and click the "Continue" button
+    	WebElement continueButton = driver.findElement(By.xpath("//a[normalize-space()='Continue']"));
+    	continueButton.click();
     	
     }
-    @Test (priority = 3)
-    public void Login () {
-        //element 
-    	WebElement LoginButton = driver.findElement(By.partialLinkText("Login or "));
-    	WebElement LoginName = driver.findElement(By.id("loginFrm_loginname"));
-    	WebElement PasswordLogin = driver.findElement(By.id("loginFrm_password"));
-    	WebElement LoginButton1 = driver.findElement(By.xpath("//button[normalize-space()='Login']"));
-    	
-    	//action
-    	LoginButton.click();
-    	LoginName.sendKeys(TheUserName);
-    	PasswordLogin.sendKeys(ThePassword);
-    	LoginButton1.click();
+    @Test (priority = 3,enabled = false)
+    public void Login() throws InterruptedException {
+    	// Step 1: click the login link first
+    	WebElement loginLink = driver.findElement(By.partialLinkText("Login or "));
+    	loginLink.click();
+
+    	// Step 2: wait a bit to allow the login form to load
+    	Thread.sleep(3000);
+
+    	// Step 3: locate the login form fields
+    	WebElement loginName = driver.findElement(By.id("loginFrm_loginname"));
+    	WebElement password = driver.findElement(By.id("loginFrm_password"));
+    	WebElement loginButton = driver.findElement(By.xpath("//button[normalize-space()='Login']"));
+
+    	// Step 4: perform login
+    	loginName.sendKeys(TheUserName);
+    	password.sendKeys(ThePassword);
+    	loginButton.click();
     	
     }
+    @Test (priority = 4,invocationCount = 20 )
+    public void AddToCart() throws InterruptedException {
+    	
+    	driver.navigate().to("https://automationteststore.com/");
+    	Thread.sleep(1000);
+    	List<WebElement> TheListOfIteams = driver.findElements(By.className("prdocutname"));
+    	int TheTotalNumberOfIteams = TheListOfIteams.size();
+    
+    System.out.println(2);
+    int RandomIteamIndex = rand.nextInt(TheTotalNumberOfIteams);
+    TheListOfIteams.get(RandomIteamIndex).click();
+    Thread.sleep(3000);
+    if (driver.getPageSource().contains("Out of Stock")) {
+    	driver.navigate().back();
+    	
+    	System.out.println("sorry the iteam out of the stoke");
+    }
+    else {
+    	System.out.println("the iteam is  availeble");
+    	
+    }
+    }
+    
+    
 }
 
 
