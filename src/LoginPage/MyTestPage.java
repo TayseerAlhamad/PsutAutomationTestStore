@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -21,13 +22,14 @@ public class MyTestPage {
     Random rand = new Random();
     String TheUserName = "randomFirstName + randomLastName + randomNumberForEmail";
     String ThePassword = "Ahmad#123";
+    String ConfirmtionMessage = "Your Account Has Been Created!";
     @BeforeTest
     public void mySetUp() {
         driver.manage().window().maximize();
         driver.get(theURL);
     }
 
-    @Test(priority = 1 ,enabled = false)
+    @Test(priority = 1 ,enabled = true)
     public void SignUp() throws InterruptedException {
         Thread.sleep(3000);
         driver.get(SignupPage);
@@ -109,9 +111,13 @@ public class MyTestPage {
         Thread.sleep(3000);
         
         //driver.quit();
+       boolean  actualResalt= driver.getPageSource().contains(ConfirmtionMessage);
+        
+        Assert.assertEquals(actualResalt, true,"this is to test that account has been created ");
+        
         
     }}
-    @Test (priority = 2,enabled = false)
+    @Test (priority = 2,enabled = true)
     public void Logout() throws InterruptedException {
  
     	
@@ -146,7 +152,7 @@ public class MyTestPage {
     	loginButton.click();
     	
     }
-    @Test (priority = 4,invocationCount = 20 )
+    @Test (priority = 4,invocationCount = 1 )
     public void AddToCart() throws InterruptedException {
     	
     	driver.navigate().to("https://automationteststore.com/");
@@ -156,15 +162,25 @@ public class MyTestPage {
     
     System.out.println(2);
     int RandomIteamIndex = rand.nextInt(TheTotalNumberOfIteams);
-    TheListOfIteams.get(RandomIteamIndex).click();
+    TheListOfIteams.get(0).click();
+    
     Thread.sleep(3000);
-    if (driver.getPageSource().contains("Out of Stock")) {
+    WebElement AddToCartButton = driver.findElement(By.className("productpagecart"));
+    
+    if (AddToCartButton.getText().equals("Out of Stock")) {
     	driver.navigate().back();
     	
     	System.out.println("sorry the iteam out of the stoke");
     }
     else {
-    	System.out.println("the iteam is  availeble");
+    	if(driver.getCurrentUrl().contains("product_id=116")) {
+    		WebElement Shose = driver.findElement(By.xpath("//input[@id=\"option344747\"]"));
+    		Shose.click();
+    		
+    	}
+    	AddToCartButton.click();
+    	WebElement ChechOutButton = driver.findElement(By.linkText("Checkout"));
+    	ChechOutButton.click();
     	
     }
     }
